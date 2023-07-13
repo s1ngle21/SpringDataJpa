@@ -5,14 +5,15 @@ import app.service.product.ProductService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/products")
+@Transactional
 public class ProductController {
 
     private ProductService productService;
@@ -22,20 +23,22 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<Product> getById(@PathVariable(name = "id") Long id) {
+    @Transactional(readOnly = true)
+    public ResponseEntity<Product> getById(@PathVariable(name = "id") Long id) {
         return ResponseEntity
                 .ok(this.productService.getById(id).get());
     }
 
     @GetMapping
-    ResponseEntity<?> getAll() {
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<Product>> getAll() {
         return ResponseEntity
                 .ok(this.productService.getAll());
     }
 
     @PostMapping
     @ResponseBody
-    ResponseEntity<Product> add(@RequestBody Product product) {
+    public ResponseEntity<Product> add(@RequestBody Product product) {
         Product addedProduct = this.productService.add(product);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -43,12 +46,10 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<?> delete(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<?> delete(@PathVariable(name = "id") Long id) {
         this.productService.delete(id);
         return ResponseEntity
-                .ok()
-                .header("Product deleted", UUID.randomUUID().toString())
-                .build();
+                .ok("Product has been deleted");
     }
 
 

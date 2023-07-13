@@ -18,7 +18,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = "/orders")
 @AllArgsConstructor
-@Transactional
 public class OrderController {
 
     private OrderService orderService;
@@ -29,8 +28,8 @@ public class OrderController {
                                         @PathVariable(name = "productId") Long productId) {
         Order order = orderService.getById(orderId);
         Optional<Product> product = productService.getById(productId);
-
         order.addProduct(product.get());
+        order.setCost(order.getCost() + product.get().getCost());
         product.get().setOrderId(orderId);
         return ResponseEntity.ok("Product added to order successfully");
     }
@@ -40,7 +39,7 @@ public class OrderController {
         Optional<Product> product = productService.getById(productId);
         Order order = new Order();
         order.setCreatedAt(LocalDateTime.now());
-        order.setCost(order.getCost() + product.get().getCost());
+        order.setCost(product.get().getCost());
         order.addProduct(product.get());
         Order addedOrder = orderService.add(order);
         product.get().setOrderId(addedOrder.getId());
@@ -61,7 +60,6 @@ public class OrderController {
     }
 
     @GetMapping
-    @Transactional(readOnly = true)
     public ResponseEntity<?> getAll() {
         List<Order> orders = orderService.getAll();
         return ResponseEntity
@@ -74,8 +72,6 @@ public class OrderController {
     public ResponseEntity<?> delete(@PathVariable(name = "id") @RequestBody Long id) {
         orderService.delete(id);
         return ResponseEntity
-                .ok()
-                .header("Order has been deleted", UUID.randomUUID().toString())
-                .build();
+                .ok("Order has been deleted");
     }
 }

@@ -5,38 +5,37 @@ import app.repository.product.ProductRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class OrderRepositoryImpl implements OrderRepository{
     private ProductRepository productRepository;
-    private List<Order> orders;
+    private Map<Long, Order> orders;
 
     public OrderRepositoryImpl(ProductRepository productRepository) {
         this.productRepository = productRepository;
-        this.orders = new ArrayList<>();
+        this.orders = new HashMap<>();
     }
 
 
 
     public Order add(Order order) {
-        orders.add(order);
+        orders.put(order.getId(), order);
         return order;
     }
 
     public Order getById(Long id) {
-        return orders.stream()
-                .filter(o -> o.getId().equals(id))
-                .findFirst()
-                .get();
+        return orders.get(id);
     }
 
     public List<Order> getAll() {
-        return orders;
+        return new ArrayList<>(orders.values());
     }
 
     public void delete(Long id) {
-        orders.removeIf(o -> o.getId().equals(id));
+        orders.remove(id);
     }
 
 
