@@ -4,15 +4,12 @@ import app.entity.Order;
 import app.repository.product.ProductRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
-public class OrderRepositoryImpl implements OrderRepository{
+public class OrderRepositoryImpl implements OrderRepository {
     private ProductRepository productRepository;
-    private Map<Long, Order> orders;
+    private Map<UUID, Order> orders;
 
     public OrderRepositoryImpl(ProductRepository productRepository) {
         this.productRepository = productRepository;
@@ -20,13 +17,12 @@ public class OrderRepositoryImpl implements OrderRepository{
     }
 
 
-
     public Order add(Order order) {
         orders.put(order.getId(), order);
         return order;
     }
 
-    public Order getById(Long id) {
+    public Order getById(UUID id) {
         return orders.get(id);
     }
 
@@ -34,7 +30,7 @@ public class OrderRepositoryImpl implements OrderRepository{
         return new ArrayList<>(orders.values());
     }
 
-    public void delete(Long id) {
+    public void delete(UUID id) {
         orders.remove(id);
     }
 

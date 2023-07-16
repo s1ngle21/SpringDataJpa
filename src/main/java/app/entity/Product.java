@@ -3,6 +3,7 @@ package app.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+
 @Entity
 @Table(name = "products")
 @Getter
@@ -22,5 +23,4 @@ public class Product {
     @Column(name = "cost")
     private double cost;
 
-    private Long orderId;
 }

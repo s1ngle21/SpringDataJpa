@@ -1,19 +1,14 @@
 package app.controller;
 
 import app.entity.Order;
-import app.entity.Product;
 import app.service.order.OrderService;
-import app.service.product.ProductService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+
 
 @RestController
 @RequestMapping(value = "/orders")
@@ -21,38 +16,25 @@ import java.util.UUID;
 public class OrderController {
 
     private OrderService orderService;
-    private ProductService productService;
+
 
     @PostMapping("/{orderId}/products/{productId}")
-    ResponseEntity<?> addProductToOrder(@PathVariable(name = "orderId") Long orderId,
-                                        @PathVariable(name = "productId") Long productId) {
-        Order order = orderService.getById(orderId);
-        Optional<Product> product = productService.getById(productId);
-        order.addProduct(product.get());
-        order.setCost(order.getCost() + product.get().getCost());
-        product.get().setOrderId(orderId);
-        return ResponseEntity.ok("Product added to order successfully");
+    ResponseEntity<Order> addProductToOrder(@PathVariable(name = "orderId") UUID orderId,
+                                            @PathVariable(name = "productId") Long productId) {
+        Order order = orderService.addProductToOrder(orderId, productId);
+        return ResponseEntity.ok(order);
     }
 
     @PostMapping("/products/{productId}")
-    ResponseEntity<?> createOrderByAddingProduct(@PathVariable(name = "productId") Long productId) {
-        Optional<Product> product = productService.getById(productId);
-        Order order = new Order();
-        order.setCreatedAt(LocalDateTime.now());
-        order.setCost(product.get().getCost());
-        order.addProduct(product.get());
-        Order addedOrder = orderService.add(order);
-        product.get().setOrderId(addedOrder.getId());
+    ResponseEntity<Order> createOrderByAddingProduct(@PathVariable(name = "productId") Long productId) {
+        Order order = orderService.createOrderByAddingProduct(productId);
         return ResponseEntity
-                .ok("Product added to new order successfully");
+                .ok(order);
     }
 
 
-
     @GetMapping("/{id}")
-    @ResponseBody
-    @Transactional(readOnly = true)
-    public ResponseEntity<Order> getById(@PathVariable(name = "id") @RequestBody Long id) {
+    public ResponseEntity<Order> getById(@PathVariable(name = "id") UUID id) {
         Order order = orderService.getById(id);
         return ResponseEntity
                 .ok()
@@ -60,7 +42,7 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAll() {
+    public ResponseEntity<List<Order>> getAll() {
         List<Order> orders = orderService.getAll();
         return ResponseEntity
                 .ok()
@@ -69,7 +51,7 @@ public class OrderController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable(name = "id") @RequestBody Long id) {
+    public ResponseEntity<String> delete(@PathVariable(name = "id") UUID id) {
         orderService.delete(id);
         return ResponseEntity
                 .ok("Order has been deleted");

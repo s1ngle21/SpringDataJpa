@@ -1,12 +1,14 @@
 package app.entity;
 
 
-import jakarta.persistence.*;
 import lombok.*;
+
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 
 @Getter
 @Setter
@@ -14,9 +16,7 @@ import java.util.List;
 @EqualsAndHashCode
 public class Order {
 
-    private Long id;
-
-    private static Long nextId = 1L;
+    private UUID id;
 
     private double cost;
 
@@ -25,14 +25,14 @@ public class Order {
     private List<Product> products;
 
     public Order(double cost, LocalDateTime createdAt) {
-        this.id = nextId++;
+        this.id = UUID.randomUUID();
         this.cost = cost;
         this.createdAt = createdAt;
         this.products = new ArrayList<>();
     }
 
     public Order() {
-        this.id = nextId++;
+        this.id = UUID.randomUUID();
         this.products = new ArrayList<>();
     }
 
